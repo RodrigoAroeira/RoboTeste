@@ -82,14 +82,24 @@ class Pintao(Cog):
         embed = Embed(title="🍺 Pintão Leaderboard")
         embed.set_image(url=URL_PINTAO)
 
-        def add_field(rank: int, user: User, alc: float, *, inline: bool = False):
+        def add_field(
+            rank: int,
+            user: User,
+            alc: float,
+            *,
+            medal: str | None = None,
+            inline: bool = False,
+        ):
+            if medal is None:
+                medal = ""
             embed.add_field(
-                name=f"#{rank} - {user.display_name}",
+                name=f"#{rank} - {user.display_name}{medal}",
                 value=truncate(alc),
                 inline=inline,
             )
 
         ordered = sorted(self.db.data.items(), key=lambda tup: tup[1], reverse=True)
+        medals = (":medal:", ":second_place:", ":third_place:")
 
         # --------------------- Caso usuario especifico ---------------------
         if user is not None:
@@ -103,6 +113,7 @@ class Pintao(Cog):
 
         # --------------------- Caso leaderboard geral ---------------------
         for i, (id, alc) in enumerate(ordered[:3]):
+            medal = medals[i]
             rank1 = i + 1
             user = self.bot.get_user(id) or await self.bot.fetch_user(id)
             j = i + 3
@@ -110,10 +121,10 @@ class Pintao(Cog):
                 rank2 = j + 1
                 id2, alc2 = ordered[j]
                 user2 = self.bot.get_user(id2) or await self.bot.fetch_user(id2)
-                add_field(rank1, user, alc, inline=True)
-                add_field(rank2, user2, alc2, inline=True)
+                add_field(rank1, user, alc, inline=True, medal=medal)
+                add_field(rank2, user2, alc2, inline=True, medal=None)
             else:
-                add_field(rank1, user, alc)
+                add_field(rank1, user, alc, medal=medal)
 
         total = sum(alc for _, alc in ordered)
         embed.add_field(name="Total", value=truncate(total), inline=True)
