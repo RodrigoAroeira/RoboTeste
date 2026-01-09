@@ -78,16 +78,6 @@ class Cog(commands.Cog):
         await msg.delete()
         await ctx.message.delete()
 
-    @commands.hybrid_command(hidden=True)
-    @commands.is_owner()
-    async def close(self, ctx: commands.Context):
-        await ctx.message.delete()
-        await self.bot.close()
-
-    @commands.command()
-    async def test(self, ctx: commands.Context, a: str = "", *rest):
-        await ctx.send(content=f"author = {ctx.author}, {a = }, {rest = }")
-
     @commands.command(name="as")
     async def As(
         self, ctx: commands.Context, user: discord.User, command: str, *args: str
