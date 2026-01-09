@@ -102,6 +102,7 @@ class Cog(commands.Cog):
 
     @commands.command()
     async def send(self, ctx: commands.Context, user: discord.User, *msg: str):
+        """Envia mensagem a um outro usuário pelo bot"""
         name = ctx.author.display_name or ctx.author.name
         url = ctx.author.mention
         content = f"{name} ({url}) sent: " + " ".join(msg)
