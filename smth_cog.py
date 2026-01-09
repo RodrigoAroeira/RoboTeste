@@ -68,7 +68,8 @@ class Cog(commands.Cog):
         if not contents:
             return
         command_name = contents[0].lstrip("%")
-        if not is_command(command_name, self):
+        if not is_command(command_name, self.bot):
+            await ctx.send(f"'{command_name}' is not a command")
             return
         msg = "%" + " ".join(contents)
         dc_msg = ctx.message
