@@ -33,27 +33,7 @@ class Cog(commands.Cog):
     async def ping(self, ctx: commands.Context):
         await ctx.send(content="Pong!")
 
-    @commands.command(hidden=True)
-    @commands.has_permissions(administrator=True)
-    async def reload(self, ctx: commands.Context):
-        """Shuts down bot and restarts"""
-        if self.bot.owner_ids is None:
-            await ctx.send("Unable to verify permissions")
-            return
-
-        if ctx.author.id not in self.bot.owner_ids:
-            await ctx.send("Only the owners are able to run this command")
-            return
-
-        await ctx.send(content="Functionality not yet implemented")
-
-    @commands.hybrid_command()
-    async def gif(self, ctx):
-        url = "https://media.tenor.com/eR3p9ASRcnUAAAAM/jerma-screaming.gif"
-        msg = await ctx.send(content=url)
-        await msg.delete(delay=5)
-
-    @commands.command(hidden=True)
+    @commands.command(hidden=True, aliases=["cpf"])
     @commands.is_owner()
     async def leak(self, ctx: commands.Context):
         cpf = os.getenv("CPF")
