@@ -1,6 +1,8 @@
 import os
 from pathlib import Path
-from typing import Generator
+from typing import Generator, Iterable
+
+from discord.ext import commands
 
 
 def gather_cogs(path: Path | str = Path()) -> Generator[str]:
@@ -14,3 +16,27 @@ def gather_owners() -> Generator[int]:
     for key, value in os.environ.items():
         if "OWNER_ID" in key:
             yield int(value)
+
+
+def is_command(s: str, bot: commands.Bot) -> bool:
+    return s in map(str, bot.commands)
+
+
+class SizedList[T](list[T]):
+    def __init__(self, size: int):
+        if size <= 0:
+            raise ValueError("Size for SizedList must be greater than 0")
+        self.size = size
+        super().__init__()
+
+    def limit_size(self):
+        while len(self) > self.size:
+            del self[0]
+
+    def append(self, item: T):
+        super().append(item)
+        self.limit_size()
+
+    def extend(self, iterable: Iterable[T], /) -> None:
+        super().extend(iterable)
+        self.limit_size()
