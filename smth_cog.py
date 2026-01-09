@@ -71,7 +71,7 @@ class Cog(commands.Cog):
         if not is_command(command_name, self.bot):
             await ctx.send(f"'{command_name}' is not a command")
             return
-        msg = "%" + " ".join(contents)
+        msg = f"%{command_name} {' '.join(contents[1:])}"
         dc_msg = ctx.message
         dc_msg.content = msg
         for _ in range(n):
