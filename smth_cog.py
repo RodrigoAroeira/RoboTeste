@@ -4,28 +4,13 @@ import os
 import discord
 from discord.ext import commands
 
+from utils import is_command
 
-async def setup(bot):
+
+async def setup(bot: commands.Bot):
     await bot.add_cog(Cog(bot))
 
 
-def is_command(s: str, obj):
-    try:
-        return s in obj._commands
-    except AttributeError:
-        return False
-
-
-def register_commands[C](cls: C) -> C:
-    cls._commands = set()  # type:ignore
-    for method in dir(cls):
-        attr = getattr(cls, method)
-        if isinstance(attr, commands.Command):
-            cls._commands.add(str(attr))  # type: ignore
-    return cls
-
-
-@register_commands
 class Cog(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
