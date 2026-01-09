@@ -1,4 +1,3 @@
-import os
 from typing import Iterable
 
 import discord as dc
@@ -27,17 +26,25 @@ class MyBot(commands.Bot):
         print("Status:", self.status)
 
     async def on_command_error(self, ctx: commands.Context, err: commands.CommandError):
-        await ctx.send(f"Error when executing command: `{err}`")
-        return await super().on_command_error(ctx, err)
+        if isinstance(err, commands.MissingRequiredArgument):
+            await ctx.send("Missing required arguments.")
+            await ctx.send_help(ctx.command)
+        else:
+            await ctx.send(f"Error when executing command: `{err}`")
+            return await super().on_command_error(ctx, err)
 
     async def on_message(self, message: dc.Message) -> None:
-        if self.status in (dc.Status.invisible, dc.Status.offline):
-            return
-        await super().on_message(message)
         content = message.content
-        if not content.startswith(str(os.getenv("PREFIX"))):
-            return
-        author = message.author
-        where = "Direct" if not message.guild else message.guild.name
 
-        print(f"LOG: {where} - {author}: {content}")
+        author = message.author
+        guild = message.guild
+        guild_str = "Direct" if not guild else f"{guild.name}"
+        channel = "" if not guild else f"/{message.channel.name}"  # type: ignore
+
+        data = message.created_at.astimezone().strftime("%d %b %Y, %H:%M")
+        bot_info = "(BOT)" if message.author.bot else ""
+        log_msg = f"{guild_str}{channel} - {author}: {content}\n"
+        print(f"LOG{bot_info} {data}: {log_msg}", end="")
+        with open("/tmp/log.txt", "a") as f:
+            f.write(log_msg)
+        await super().on_message(message)
