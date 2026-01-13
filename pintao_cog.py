@@ -61,8 +61,9 @@ class Pintao(Cog):
         _ = when.strftime("%d %b %Y, %H:%M")
 
         bebida = self.bebidas.get_bebida(tipo)
-        for _ in range(quantidade):
-            await self.db.adicionar(ctx.author.id, bebida)
+        if bebida is None:
+            raise BadArgument(f"'{tipo}' não é uma bebida válida")
+        await self.db.adicionar(ctx.author.id, bebida, quantidade)
 
         await ctx.send(
             f"Você adicionou {truncate(bebida.quant_alc * quantidade)} ao seu placar"
