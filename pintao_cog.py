@@ -258,9 +258,23 @@ class Leaderboard(Saveable):
         self.__setup()
         self.data = self.__load()
 
-    async def adicionar(self, user_id: int, tipo: Bebida):
-        self.data[user_id] += tipo.quant_alc
+    async def __helper(
+        self, user_id: int, tipo: Bebida, quantidade: int, *, remover: bool
+    ):
+        amount = tipo.quant_alc * quantidade
+        if remover:
+            self.data[user_id] -= amount
+            if self.data[user_id] < 0:
+                self.data[user_id] = 0
+        else:
+            self.data[user_id] += amount
         await self.save()
+
+    async def adicionar(self, user_id: int, tipo: Bebida, quantidade: int):
+        await self.__helper(user_id, tipo, quantidade, remover=False)
+
+    async def remover(self, user_id: int, tipo: Bebida, quantidade: int):
+        await self.__helper(user_id, tipo, quantidade, remover=True)
 
 
 @dataclass
