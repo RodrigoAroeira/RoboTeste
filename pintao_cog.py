@@ -58,9 +58,6 @@ class Pintao(Cog):
         if quantidade <= 0:
             raise BadArgument("quantidade deve ser um número inteiro positivo")
 
-        when = ctx.message.created_at.astimezone()
-        _ = when.strftime("%d %b %Y, %H:%M")
-
         bebida = self.bebidas.get_bebida(tipo)
         if bebida is None:
             raise BadArgument(f"'{tipo}' não é uma bebida válida")
@@ -80,9 +77,6 @@ class Pintao(Cog):
         """Remove a bebida do placar"""
         if quantidade <= 0:
             raise BadArgument("quantidade deve ser um número inteiro positivo")
-
-        when = ctx.message.created_at.astimezone()
-        _ = when.strftime("%d %b %Y, %H:%M")
 
         bebida = self.bebidas.get_bebida(tipo)
         if bebida is None:
