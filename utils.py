@@ -4,6 +4,10 @@ from typing import Generator, Iterable
 
 from discord.ext import commands
 
+from platformdirs import user_data_dir
+
+DATA_DIR = Path(user_data_dir("robo-discord"))
+
 
 def gather_cogs(path: Path | str = Path()) -> Generator[str]:
     for file in Path(path).iterdir():

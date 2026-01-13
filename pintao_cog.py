@@ -18,9 +18,7 @@ from discord.ext.commands import (
     hybrid_command,
     parameter,
 )
-from platformdirs import user_data_dir
-
-DATA_DIR = Path(user_data_dir("robo-discord"))
+from utils import DATA_DIR
 
 DATABASE_PATH = DATA_DIR / "pintao.json"
 BEBIDAS_PATH = DATA_DIR / "bebidas.csv"
