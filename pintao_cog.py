@@ -120,10 +120,10 @@ class Pintao(Cog):
         ):
             if medal is None:
                 medal = ""
+
+            value = f"{alc2latas(alc)} ({truncate(alc)})"
             embed.add_field(
-                name=f"#{rank} - {user.display_name}{medal}",
-                value=truncate(alc),
-                inline=inline,
+                name=f"#{rank} - {user.display_name}{medal}", value=value, inline=inline
             )
 
         ordered = sorted(self.db.data.items(), key=lambda tup: tup[1], reverse=True)
@@ -155,10 +155,13 @@ class Pintao(Cog):
                 add_field(rank1, user, alc, medal=medal)
 
         total = sum(alc for _, alc in ordered)
-        embed.add_field(name="Total", value=truncate(total), inline=True)
+        total_str = f"{as_latas(total)} ({truncate(total)})"
+        embed.add_field(name="Total", value=total_str, inline=True)
 
         meta = 1000 * 269 * 0.079  # ml
-        embed.add_field(name="Meta", value=truncate(meta) + "(1000 beats)", inline=True)
+        embed.add_field(
+            name="Meta", value=f"1000 beats ({truncate(meta)})", inline=True
+        )
         await ctx.send(embed=embed)
 
     @hybrid_command(aliases=["cb"])
@@ -368,3 +371,9 @@ class Bebida:
     @property
     def quant_alc(self) -> float:
         return self.volume * self.abv
+
+
+def alc2latas(alc: float) -> str:
+    alc_beats = 269 * 0.079
+    alc2lata = alc / alc_beats
+    return f"{alc2lata:.2f} latas"
