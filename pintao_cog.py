@@ -308,17 +308,24 @@ class BebidasCSV(Saveable):
     async def adicionar_bebida(
         self, nome: str, volume: float, abv: float, *, update: bool = False
     ):
-        if not update and any(b.nome == nome for b in self):
+        if not update and self.get_bebida(nome) is not None:
             raise ValueError("Bebida já existe")
         bebida = Bebida(nome, volume, abv)
         self.bebidas.append(bebida)
         await self.save()
 
-    def get_bebida(self, nome: str) -> Bebida:
+    def remover_bebida(self, nome: str):
+        for b in self:
+            if b.nome.lower() == nome.lower():
+                self.bebidas.remove(b)
+                return
+        raise ValueError(f"Bebida {nome} não existe")
+
+    def get_bebida(self, nome: str) -> Bebida | None:
         for b in self:
             if b.nome.lower() == nome.lower():
                 return b
-        raise BadArgument(f"'{nome}' não é uma bebida válida")
+        return None
 
     def __ler_csv_bebidas(self, path: Path | str):
         bebidas = []
