@@ -140,22 +140,13 @@ class Pintao(Cog):
             return
 
         # --------------------- Caso leaderboard geral ---------------------
-        for i, (id, alc) in enumerate(ordered[:3]):
-            medal = medals[i]
-            rank1 = i + 1
+        for i, (id, alc) in enumerate(ordered):
+            medal = medals[i] if i < 3 else ""
             user = self.bot.get_user(id) or await self.bot.fetch_user(id)
-            j = i + 3
-            if j < len(ordered):
-                rank2 = j + 1
-                id2, alc2 = ordered[j]
-                user2 = self.bot.get_user(id2) or await self.bot.fetch_user(id2)
-                add_field(rank1, user, alc, inline=True, medal=medal)
-                add_field(rank2, user2, alc2, inline=True, medal=None)
-            else:
-                add_field(rank1, user, alc, medal=medal)
+            add_field(i + 1, user, alc, medal=medal)
 
         total = sum(alc for _, alc in ordered)
-        total_str = f"{as_latas(total)} ({truncate(total)})"
+        total_str = f"{alc2latas(total)} ({truncate(total)})"
         embed.add_field(name="Total", value=total_str, inline=True)
 
         meta = 1000 * 269 * 0.079  # ml
