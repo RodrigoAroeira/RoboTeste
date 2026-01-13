@@ -57,6 +57,9 @@ class Pintao(Cog):
             %beber cerveja 3
             %beber beats 2
         """
+        if quantidade <= 0:
+            raise BadArgument("quantidade deve ser um número inteiro positivo")
+
         when = ctx.message.created_at.astimezone()
         _ = when.strftime("%d %b %Y, %H:%M")
 
