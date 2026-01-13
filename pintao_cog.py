@@ -67,7 +67,7 @@ class Pintao(Cog):
         await self.db.adicionar(ctx.author.id, bebida, quantidade)
 
         await ctx.send(
-            f"Você adicionou {truncate(bebida.quant_alc * quantidade)} ao seu placar"
+            f"Você adicionou {vol2str(bebida.quant_alc * quantidade)} ao seu placar"
         )
 
     @command()
@@ -91,7 +91,7 @@ class Pintao(Cog):
         await self.db.remover(ctx.author.id, bebida, quantidade)
 
         await ctx.send(
-            f"Você vomitou {truncate(bebida.quant_alc * quantidade)} de alcool"
+            f"Você vomitou {vol2str(bebida.quant_alc * quantidade)} de alcool"
         )
 
     # TODO: Remover codigo repetido
@@ -119,7 +119,7 @@ class Pintao(Cog):
             if medal is None:
                 medal = ""
 
-            value = f"{alc2latas(alc)} ({truncate(alc)})"
+            value = f"{alc2latas(alc)} ({vol2str(alc)})"
             embed.add_field(
                 name=f"#{rank} - {user.display_name}{medal}", value=value, inline=inline
             )
@@ -144,13 +144,11 @@ class Pintao(Cog):
             add_field(i + 1, user, alc, medal=medal)
 
         total = sum(alc for _, alc in ordered)
-        total_str = f"{alc2latas(total)} ({truncate(total)})"
+        total_str = f"{alc2latas(total)} ({vol2str(total)})"
         embed.add_field(name="Total", value=total_str, inline=True)
 
         meta = 1000 * 269 * 0.079  # ml
-        embed.add_field(
-            name="Meta", value=f"1000 beats ({truncate(meta)})", inline=True
-        )
+        embed.add_field(name="Meta", value=f"1000 beats ({vol2str(meta)})", inline=True)
         await ctx.send(embed=embed)
 
     @hybrid_command(aliases=["cb"])
@@ -197,12 +195,12 @@ class Pintao(Cog):
         embed = Embed(title="Bebidas")
         embed.set_image(url=URL_PINTAO)
         for b in self.bebidas:
-            value = f"Vol: {truncate(b.volume)}; ABV: {b.abv}"
+            value = f"Vol: {vol2str(b.volume)}; ABV: {b.abv}"
             embed.add_field(name=b.nome, value=value, inline=False)
         await ctx.send(embed=embed)
 
 
-def truncate(val: float) -> str:
+def vol2str(val: float) -> str:
     if val >= 1000:
         return f"{val / 1000:.3f}L"
     return f"{val:.3f}mL"
