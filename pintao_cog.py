@@ -68,6 +68,30 @@ class Pintao(Cog):
             f"Você adicionou {truncate(bebida.quant_alc * quantidade)} ao seu placar"
         )
 
+    @command()
+    async def vomitar(
+        self,
+        ctx: Context,
+        tipo: str = parameter(description="Tipo da bebida consumida"),
+        quantidade: int = parameter(description="Unidades consumidas", default=1),
+    ):
+        """Remove a bebida do placar"""
+        if quantidade <= 0:
+            raise BadArgument("quantidade deve ser um número inteiro positivo")
+
+        when = ctx.message.created_at.astimezone()
+        _ = when.strftime("%d %b %Y, %H:%M")
+
+        bebida = self.bebidas.get_bebida(tipo)
+        if bebida is None:
+            raise BadArgument(f"'{tipo}' não é uma bebida válida")
+
+        await self.db.remover(ctx.author.id, bebida, quantidade)
+
+        await ctx.send(
+            f"Você vomitou {truncate(bebida.quant_alc * quantidade)} de alcool"
+        )
+
     # TODO: Remover codigo repetido
     @hybrid_command()
     async def pintao(
