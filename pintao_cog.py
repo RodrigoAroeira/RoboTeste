@@ -187,12 +187,13 @@ class Pintao(Cog):
         await self.bebidas.adicionar_bebida(nome, volume, abv, update=update)
         await ctx.send(f"{nome} adicionado nas bebidas")
 
-    @command(hidden=True)
-    async def vomitar(self, ctx: Context):
-        """|NAO IMPLEMENTADO|
-        Comando de Undo"""
-        _ = ctx
-        raise NotImplementedError("")
+    @hybrid_command(aliases=["db"])
+    async def descadastrar_bebida(
+        self, ctx: Context, nome: str = parameter(description="Nome da bebida")
+    ):
+        """Cadastra uma nova bebida no registro de bebidas. Adicionar bebidas em quantidades bebíveis"""
+        self.bebidas.remover_bebida(nome)
+        await ctx.send(f"Bebida '{nome}' foi removida com sucesso")
 
     @command(name="bebidas")
     async def show_bebidas(self, ctx: Context):
