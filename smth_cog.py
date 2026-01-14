@@ -48,13 +48,8 @@ class Cog(commands.Cog):
         self, ctx: commands.Context, user: discord.User, command: str, *args: str
     ):
         """Executa comandos como um outro usuário."""
-        if not self.bot.owner_ids:
-            breach = user.id == self.bot.owner_id and ctx.author.id != self.bot.owner_id
-        else:
-            breach = (
-                user.id in self.bot.owner_ids
-                and ctx.author.id not in self.bot.owner_ids
-            )
+        owners = self.bot.owner_ids or (self.bot.owner_id,)
+        breach = user.id in owners and ctx.author.id not in owners
         if breach:
             raise commands.CheckFailure(
                 "For safety reasons you may not run commands as an owner since you're not an owner yourself."
