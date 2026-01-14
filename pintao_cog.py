@@ -8,7 +8,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import DefaultDict
 
-from discord import Embed, User
+from discord import Embed, File, User
 from discord.ext.commands import (
     BadArgument,
     Bot,
@@ -18,6 +18,7 @@ from discord.ext.commands import (
     hybrid_command,
     parameter,
 )
+
 from utils import DATA_DIR
 
 DATABASE_PATH = DATA_DIR / "pintao.json"
@@ -63,9 +64,9 @@ class Pintao(Cog):
             raise BadArgument(f"'{tipo}' não é uma bebida válida")
         await self.db.adicionar(ctx.author.id, bebida, quantidade)
 
-        await ctx.send(
-            f"Você adicionou {vol2str(bebida.quant_alc * quantidade)} ao seu placar"
-        )
+        alc = bebida.quant_alc * quantidade
+        s = vol2info(alc)
+        await ctx.send(f"Você adicionou {s} ao seu placar")
 
     @command()
     async def vomitar(
@@ -84,9 +85,9 @@ class Pintao(Cog):
 
         await self.db.remover(ctx.author.id, bebida, quantidade)
 
-        await ctx.send(
-            f"Você vomitou {vol2str(bebida.quant_alc * quantidade)} de alcool"
-        )
+        alc = bebida.quant_alc * quantidade
+        s = vol2info(alc)
+        await ctx.send(f"Você vomitou {s}")
 
     # TODO: Remover codigo repetido
     @hybrid_command()
@@ -193,11 +194,18 @@ class Pintao(Cog):
             embed.add_field(name=b.nome, value=value, inline=False)
         await ctx.send(embed=embed)
 
+    @hybrid_command()
+    async def dump(self, ctx: Context):
+        bebidas = File(BEBIDAS_PATH, filename="bebidas.csv")
+        leaderboard = File(DATABASE_PATH, filename="pintao.json")
 
-def vol2str(val: float) -> str:
-    if val >= 1000:
-        return f"{val / 1000:.3f}L"
-    return f"{val:.3f}mL"
+        await ctx.message.delete(delay=60)
+        await ctx.send(files=[bebidas, leaderboard], delete_after=60)
+        cnt = 60
+        msg = await ctx.send(f"{cnt}")
+        for i in range(1, cnt + 1):
+            await msg.edit(content=f"{cnt - i}")
+            await asyncio.sleep(1)
 
 
 class Saveable(ABC):
@@ -216,7 +224,7 @@ class Leaderboard(Saveable):
     semaforo: asyncio.Semaphore = field(init=False, default_factory=asyncio.Semaphore)
 
     async def save(self) -> None:
-        async with self.semaforo:
+        def inner():
             if not self.data:
                 return
 
@@ -227,6 +235,9 @@ class Leaderboard(Saveable):
             with open(self.path, "w") as f:
                 json.dump(dict(self.data), f)
             print(f"Saved database: {self.path}")
+
+        async with self.semaforo:
+            await asyncio.to_thread(inner)
 
     def __setup(self):
         for par in self.path.parents:
@@ -249,13 +260,8 @@ class Leaderboard(Saveable):
     async def __helper(
         self, user_id: int, tipo: Bebida, quantidade: int, *, remover: bool
     ):
-        amount = tipo.quant_alc * quantidade
-        if remover:
-            self.data[user_id] -= amount
-            if self.data[user_id] < 0:
-                self.data[user_id] = 0
-        else:
-            self.data[user_id] += amount
+        amount = tipo.quant_alc * quantidade * (-1 if remover else 1)
+        self.data[user_id] = max(self.data[user_id] + amount, 0)
         await self.save()
 
     async def adicionar(self, user_id: int, tipo: Bebida, quantidade: int):
@@ -277,7 +283,7 @@ class BebidasCSV(Saveable):
         self.bebidas = self.__ler_csv_bebidas(self.path)
 
     async def save(self):
-        async with self.semaforo:
+        def inner():
             if not self.bebidas:
                 return
 
@@ -292,6 +298,10 @@ class BebidasCSV(Saveable):
                             "abv": bebida.abv,
                         }
                     )
+            print(f"Saved CSV: {self.path}")
+
+        async with self.semaforo:
+            await asyncio.to_thread(inner)
 
     async def adicionar_bebida(
         self, nome: str, volume: float, abv: float, *, update: bool = False
@@ -354,7 +364,22 @@ class Bebida:
         return self.volume * self.abv
 
 
+def vol2str(val: float) -> str:
+    if val >= 1000:
+        return f"{val / 1000:.3f}L"
+    return f"{val:.3f}mL"
+
+
 def alc2latas(alc: float) -> str:
     alc_beats = 269 * 0.079
     alc2lata = alc / alc_beats
-    return f"{alc2lata:.2f} latas"
+    rounded = f"{alc2lata:.2f}"
+    plural = "" if rounded == "1.00" else "s"
+    return f"{rounded} lata{plural}"
+
+
+def vol2info(vol: float) -> str:
+    latas = alc2latas(vol)
+    ml = vol2str(vol)
+
+    return f"{latas} ({ml})"
