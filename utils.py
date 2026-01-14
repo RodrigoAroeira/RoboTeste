@@ -23,7 +23,7 @@ def gather_owners() -> Generator[int]:
 
 
 def is_command(s: str, bot: commands.Bot) -> bool:
-    return s in map(str, bot.commands)
+    return any(s == str(c) or c in c.aliases for c in bot.commands)
 
 
 class SizedList[T](list[T]):
