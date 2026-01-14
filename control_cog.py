@@ -45,7 +45,24 @@ class Control(commands.Cog):
     async def uptime(self, ctx: Context):
         now = datetime.now()
         delta = now - self.start
-        await ctx.send(f"{delta = }")
+
+        total_seconds = int(delta.total_seconds())
+        days, remainder = divmod(total_seconds, 86400)
+        hours, remainder = divmod(remainder, 3600)
+        minutes, seconds = divmod(remainder, 60)
+
+        parts = []
+        if days > 0:
+            parts.append(f"{days}d")
+        if days > 0 or hours > 0:
+            parts.append(f"{hours}h")
+        if days > 0 or hours > 0 or minutes > 0:
+            parts.append(f"{minutes}m")
+
+        parts.append(f"{seconds}s")
+
+        uptime_str = " ".join(parts)
+        await ctx.send(f"Uptime: {uptime_str}")
 
     @command(hidden=True)
     @is_owner()
