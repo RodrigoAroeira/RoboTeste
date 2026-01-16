@@ -375,7 +375,7 @@ def alc2latas(alc: float) -> str:
     alc2lata = alc / alc_beats
     rounded = f"{alc2lata:.2f}"
     plural = "" if rounded == "1.00" else "s"
-    return f"{rounded} lata{plural}"
+    return f"{rounded} lata{plural} de skol beats"
 
 
 def vol2info(vol: float) -> str:
