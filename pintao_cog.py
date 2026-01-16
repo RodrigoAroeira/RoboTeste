@@ -43,7 +43,7 @@ class Pintao(Cog):
         await self.db.save()
         await self.bebidas.save()
 
-    @hybrid_command()
+    @hybrid_command(aliases=["scrobble", "scrobblar"])
     async def beber(
         self,
         ctx: Context,
@@ -90,7 +90,7 @@ class Pintao(Cog):
         await ctx.send(f"Você vomitou {s}")
 
     # TODO: Remover codigo repetido
-    @hybrid_command()
+    @hybrid_command(aliases=["scrobbles"])
     async def pintao(
         self,
         ctx: Context,
