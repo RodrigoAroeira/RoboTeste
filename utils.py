@@ -10,10 +10,12 @@ DATA_DIR = Path(user_data_dir("robo-discord"))
 
 
 def gather_cogs(path: Path | str = Path()) -> Generator[str]:
-    for file in Path(path).iterdir():
-        if "cog" not in file.name:
+    for entry in Path(path).rglob("*.py"):
+        if any(part.startswith(".") or "venv" in part for part in entry.parts):
             continue
-        yield str(file).removesuffix(".py")
+
+        if "cog" in entry.name.lower():
+            yield ".".join(entry.with_suffix("").parts)
 
 
 def gather_owners() -> Generator[int]:
