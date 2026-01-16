@@ -28,6 +28,14 @@ def is_command(s: str, bot: commands.Bot) -> bool:
     return any(s == str(c) or c in c.aliases for c in bot.commands)
 
 
+def create_path(path: Path | str, *, create_file: bool = True):
+    for par in Path(path).parents:
+        par.mkdir(parents=True, exist_ok=True)
+    if create_file:
+        with open(path, "a"):
+            """Make sure file exists"""
+
+
 class SizedList[T](list[T]):
     def __init__(self, size: int):
         if size <= 0:

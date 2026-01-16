@@ -240,10 +240,7 @@ class Leaderboard(Saveable):
             await asyncio.to_thread(inner)
 
     def __setup(self):
-        for par in self.path.parents:
-            par.mkdir(parents=True, exist_ok=True)
-        with open(self.path, "a"):
-            """Simply make sure file exists"""
+        create_path(self.path)
 
     def __load(self) -> DefaultDict[int, float]:
         with open(self.path) as f:
@@ -278,8 +275,7 @@ class BebidasCSV(Saveable):
     semaforo: asyncio.Semaphore = field(init=False, default_factory=asyncio.Semaphore)
 
     def __post_init__(self):
-        with open(self.path, "a"):
-            pass
+        create_path(self.path)
         self.bebidas = self.__ler_csv_bebidas(self.path)
 
     async def save(self):
